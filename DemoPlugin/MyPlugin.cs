@@ -22,11 +22,11 @@ namespace DemoPlugin
         public string Description => _plugindescription;
         public string Display => _display;
 
-        public MyPlugin(string id, string name, string description)
+        public MyPlugin()
         {
-            _pluginId = id;
-            _pluginName = name;
-            _plugindescription = description;
+            _pluginId = "11523579";
+            _pluginName = "CSharp Plugin";
+            _plugindescription = "Example Plugin in CSharp";
         }
 
         public void Initialize(IHost Host)
@@ -81,7 +81,8 @@ namespace DemoPlugin
 
         public Hashtable PluginOptionsDefault()
         {
-            //Set the default values you want to have on plugin, if the user doesnt change any option, he will have this settings
+            //Set the default values you want to have on plugin
+            //if the user doesnt change any option, he will have this settings
             var options = new Hashtable();
 
             options.Add("appendyesno", "No");
@@ -97,7 +98,8 @@ namespace DemoPlugin
             var options = new Hashtable();
 
             //Option: option_index as integer, option_data as ArrayList
-            //Option_Data: option_type as string, option_label as string, option_name as string (no spaces, no _)
+            //Option_Data: option_type as string, option_label as string
+            //option_name as string (no spaces, no _)
             options.Add(0, new ArrayList()
             {
                 "ComboYesNo",
@@ -125,12 +127,13 @@ namespace DemoPlugin
             {
 
                 //Option: option_index as integer, option_data as ArrayList
-                //Option_Data: option_type as string, option_label as string, option_name as string (no spaces, no _), help text
+                //Option_Data: option_type as string, option_label as string
+                //option_name as string (no spaces, no _), help text
                 options.Add(0,
                     new ArrayList() { "ColorBasic",
-                        "Color of the Text",
+                        "Colour of the Text",
                         "color",
-                        "Pick a color for your text" });
+                        "Pick a colour for your text" });
 
                 options.Add(1,
                     new ArrayList()
@@ -147,27 +150,85 @@ namespace DemoPlugin
 
         public Hashtable SetDefaultOptions(string sensorId, Hashtable elementData)
         {
-            throw new NotImplementedException();
+            //Set the default values you want to have on your sensor when its created
+            //if the user doesnt change any option, he will have this settings
+
+            if (sensorId == "DEMO.helloworld")
+            {
+                elementData["width"] = 100;
+                elementData["height"] = 41;
+                elementData["color"] = 0;
+                elementData["textSelected"] = "text1";
+            }
+            else
+            {
+                //There must be at least one width and height set
+                //otherwise the element wont show on the display - emulator window because it has no size
+                elementData["width"] = 50;
+                elementData["height"] = 50;
+            }
+
+            return elementData;
         }
 
         public ArrayList DisplayOnLCD(string sensorId, Hashtable elementData, Hashtable pluginOptions, int CacheRuns)
         {
-            throw new NotImplementedException();
+            var commandList = new ArrayList();
+
+            //Draw on the screen
+            if (sensorId == "DEMO.helloworld")
+            {
+                var x = elementData["x"];    //grab X position of the element
+                var y = elementData["y"];    //grab Y position of the element
+
+                var textToDraw = "";
+
+                if (elementData["textSelected"] == "text1")
+                {
+                    textToDraw = "Hello World";
+                }
+                else
+                {
+                    textToDraw = "Bye World";
+                }
+
+
+                if (pluginOptions["appendyesno"] == "Yes")
+                {
+                    textToDraw = $"{textToDraw}{pluginOptions["append"]}";
+                }
+
+                //Draw Text (command as string, x as integer, y as integer, text as string, reserve_width as integer, unused as bool, unused as bool, unused as integer, basic_color as integer
+                commandList.Add(new ArrayList()
+                    { "text",
+                        x,
+                        y,
+                        textToDraw,
+                        0,
+                        false,
+                        false,
+                        0,
+                        elementData["color"]
+                    });
+            }
+
+            return commandList;
+
         }
 
         public ArrayList LCDSys2_DisplayOnLCD(string sensorId, Hashtable elementData, Hashtable pluginOptions, int CacheRuns)
         {
-            throw new NotImplementedException();
+            return DisplayOnLCD(sensorId, elementData, pluginOptions, CacheRuns);
         }
 
         public Dictionary<string, string> LCDSys2_AvailableSensors(Hashtable pluginOptions)
         {
-            throw new NotImplementedException();
+            return AvailableSensors(pluginOptions);
         }
 
         public Hashtable LCDSys2_CreateOptions(string sensorId, Hashtable elementData)
         {
-            throw new NotImplementedException();
+            return CreateOptions(sensorId, elementData);
         }
     }
 }
